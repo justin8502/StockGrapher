@@ -1,4 +1,4 @@
-if(require(quantmod) && require(ggplot2) && require(reshape2)){
+if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   
   # TODO
   # Cleanup Variable Names
@@ -15,7 +15,6 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   tickers <- c("YHOO","AAPL","IWM","SMH","OIH","XLY")
   month <- 11
   day <- 1
-  
   # Stores # of stocks we are looking at
   numstock <- length(tickers)
   # Date to record from
@@ -47,7 +46,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   dfOpenCondense = melt(dfOpen, id='Date')
   # Plot the Opening values
   plot1 <- ggplot(dfOpenCondense, aes(Date, value, color = variable)) + 
-    geom_line(size=1)
+    geom_line(size=0.5)
   
   # TEMPORARY FIX - RELOAD DATA AGAIN
   # Date to record from
@@ -74,7 +73,12 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   colnames(dfATRCondense)[3] <- "Percent"
   # Plot the ATR of tickers
   plot2 <- ggplot(dfATRCondense, aes(Date, Percent, color = variable)) + 
-    geom_line(size=1)
+    geom_line(size=0.5)
+  
+  print(YHOO[, 1])
+  print(RSI(YHOO[, 1], n=14));
+  
+  # RSIset <- do.call(merge, lapply(tickers, function(x) RSI(get(x), n=14)))
   
   print(plot1)
   print(plot2)
