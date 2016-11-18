@@ -1,5 +1,10 @@
 if(require(quantmod) && require(ggplot2) && require(reshape2)){
   
+  # TODO
+  # Cleanup Variable Names
+  # Add declaration for MACROS
+  # Get ATR to work
+  
   # CLEANUP
   graphics.off()
   rm(list = ls())
@@ -32,15 +37,18 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   df <- data.frame(Date=index(LargeSet), LargeSet, row.names=NULL)
   df <- df[, getsub]
   df2 = melt(df, id='Date')
-  ggplot(df2, aes(Date, value, color = variable)) + geom_line(size=1)
+  plot1 <- ggplot(df2, aes(Date, value, color = variable)) + geom_line(size=1)
   
-  df <- data.frame(Date=index(LargeSet), LargeSet, row.names=NULL)
+  # Test stuff
   testATR <- do.call(merge, lapply(tickers, function(x) ATR(get(x), 10)))
   print(testATR)
+  df3 <- data.frame(Date=index(testATR), testATR, row.names=NULL)
+  df3 <- df3[, c(1, 3, 7)]
+  df4 = melt(df3, id='Date')
+  ggplot(df4, aes(Date, value, color = variable)) + geom_line(size=1)
   
-  plot1 <- ggplot(df2, aes(Date, value, color = variable)) + geom_line(size=1)
   summary(plot1)
-  
+
   plot1
 } else {
   print("Load packages failed")
