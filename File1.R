@@ -27,11 +27,10 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   # Condense ticker data into matrix
   LargeSet <- do.call(merge, lapply(tickers, function(x) get(x)))
   
-  # Vector to extract the Open values of Stocks
-  # We want the 1st column (the dates)
+  # Vectors to extract Open and ATR (we'll use them later)
   getsubopen <- c(1)
   getsubatr <- c(1)
-  # Setting up vector to extract correctly
+  # Setting up vectors to extract correctly
   for(i in 0:(numstock-1)) {
     getsubopen <- c(getsubopen, 2+i*6)
     if(i == 0){
@@ -41,33 +40,49 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
     }
   }
   
-  # Plot the Opening values 
-  df <- data.frame(Date=index(LargeSet), LargeSet, row.names=NULL)
-  df <- df[, getsubopen]
-  df2 = melt(df, id='Date')
-  plot1 <- ggplot(df2, aes(Date, value, color = variable)) + geom_line(size=1)
+  # Subset yet again into only Open columns (We don't want CLOSE, etc.)
+  dfOpen <- data.frame(Date=index(LargeSet), LargeSet, row.names=NULL)
+  dfOpen <- dfOpen[, getsubopen]
+  # Condense for easy graphing
+  dfOpenCondense = melt(dfOpen, id='Date')
+  # Plot the Opening values
+  plot1 <- ggplot(dfOpenCondense, aes(Date, value, color = variable)) + 
+    geom_line(size=1)
   
+  # TEMPORARY FIX - RELOAD DATA AGAIN
   # Date to record from
   datefrom <- paste("2016-", month-1, "-", "0", day, sep = '', collapse='')
   # Date to record to (default current date)
   dateto <- paste(Sys.Date(), sep = '', collapse='')
   # Retrieve data
   getSymbols(tickers, from=datefrom, to=dateto)
-  # Test stuff
-  testATR <- do.call(merge, lapply(tickers, function(x) ATR(get(x), 10)))
-
-  row.names(testATR) <- "Date"
-  testATR <- subset(testATR, index(testATR) >= paste("2016-", month, "-", "0", day, sep = '', collapse=''))
-  print(testATR)
-  df3 <- data.frame(Date=index(testATR), testATR, row.names=NULL)
-  df3 <- df3[, getsubatr]
-  df4 = melt(df3, id='Date')
-  plot2 <- ggplot(df4, aes(Date, value, color = variable)) + geom_line(size=1)
   
-  # summary(plot1)
+  # Create set to store results of ATR (Average True Range)
+  ATRset <- do.call(merge, lapply(tickers, function(x) ATR(get(x), 20)))
+
+  # Subset the data (cut based on time), then make it into a dataframe and
+  # Subset yet again into only atr columns (We don't want tr, etc.)
+  ATRset <- subset(ATRset, index(ATRset) >= 
+                      paste("2016-", month, "-", "0", day, sep = '', collapse=''))
+  dfATR <- data.frame(Date=index(ATRset), ATRset, row.names=NULL)
+  dfATR <- dfATR[, getsubatr]
+  # Make the graph pretty
+  colnames(dfATR) <- c("Date", tickers)
+  # Condense for easy graphing
+  dfATRCondense = melt(dfATR, id='Date')
+  # Make graph EVEN prettier
+  colnames(dfATRCondense)[3] <- "Percent"
+  # Plot the ATR of tickers
+  plot2 <- ggplot(dfATRCondense, aes(Date, Percent, color = variable)) + 
+    geom_line(size=1)
   
   print(plot1)
   print(plot2)
+  
+  summary(plot1)
+  summary(plot2)
+  
+  rm(list = ls())
 } else {
   print("Load packages failed")
 }
