@@ -57,7 +57,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2)){
   testATR <- do.call(merge, lapply(tickers, function(x) ATR(get(x), 10)))
 
   row.names(testATR) <- "Date"
-  testATR <- subset(testATR, index(testATR) >= "2016-11-01")
+  testATR <- subset(testATR, index(testATR) >= paste("2016-", month, "-", "0", day, sep = '', collapse=''))
   print(testATR)
   df3 <- data.frame(Date=index(testATR), testATR, row.names=NULL)
   df3 <- df3[, getsubatr]
