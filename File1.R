@@ -1,10 +1,5 @@
 if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   
-  # TODO
-  # Cleanup Variable Names
-  # Add declaration for MACROS
-  # Get ATR to work
-  
   # CLEANUP
   graphics.off()
   rm(list = ls())
@@ -46,7 +41,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   dfOpenCondense = melt(dfOpen, id='Date')
   # Plot the Opening values
   plot1 <- ggplot(dfOpenCondense, aes(Date, value, color = variable)) + 
-    geom_line(size=0.5)
+    geom_line(size=0.5) + ggtitle("OPEN values")
   
   # TEMPORARY FIX - RELOAD DATA AGAIN
   # Date to record from
@@ -73,7 +68,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   colnames(dfATRCondense)[3] <- "Percent"
   # Plot the ATR of tickers
   plot2 <- ggplot(dfATRCondense, aes(Date, Percent, color = variable)) + 
-    geom_line(size=0.5)
+    geom_line(size=0.5) + ggtitle("Average True Range")
   
   # Create set to store results of RSI (Relative Strength Indicator)
   RSIset <- do.call(merge, lapply(tickers, function(x) RSI(get(x)[, 6], n=14)))
@@ -90,7 +85,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   # Plot the ATR of tickers
   plot3 <- ggplot(dfRSICondense, aes(Date, Value, color = variable)) + 
     geom_line(size=0.5) + geom_hline(aes(yintercept=30)) + 
-    geom_hline(aes(yintercept=70))
+    geom_hline(aes(yintercept=70)) + ggtitle("Relative Strength Index")
   
   print(plot1)
   print(plot2)
