@@ -75,16 +75,26 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   plot2 <- ggplot(dfATRCondense, aes(Date, Percent, color = variable)) + 
     geom_line(size=0.5)
   
-  print(YHOO[, 1])
-  print(RSI(YHOO[, 1], n=14));
+  # Create set to store results of RSI (Relative Strength Indicator)
+  RSIset <- do.call(merge, lapply(tickers, function(x) RSI(get(x)[, 6], n=14)))
+  # Subset the data (cut based on time), then make it into a dataframe
+  RSIset <- subset(RSIset, index(RSIset) >= 
+                     paste("2016-", month, "-", "0", day, sep = '', collapse=''))
+  dfRSI <- data.frame(Date=index(RSIset), RSIset, row.names=NULL)
+  # Make the graph pretty
+  colnames(dfRSI) <- c("Date", tickers)
+  # Condense for easy graphing
+  dfRSICondense = melt(dfRSI, id='Date')
+  # Make graph EVEN prettier
+  colnames(dfRSICondense)[3] <- "Value"
+  # Plot the ATR of tickers
+  plot3 <- ggplot(dfRSICondense, aes(Date, Value, color = variable)) + 
+    geom_line(size=0.5)
   
-  # RSIset <- do.call(merge, lapply(tickers, function(x) RSI(get(x), n=14)))
-  
+  # Print out graphs
   print(plot1)
   print(plot2)
-  
-  summary(plot1)
-  summary(plot2)
+  print(plot3)
   
   rm(list = ls())
 } else {
