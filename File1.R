@@ -13,7 +13,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   #          Month - Desired month to start from
   #          Day - Desired day to start from
   tickers <- c("YHOO","AAPL","IWM","SMH","OIH","XLY")
-  month <- 11
+  month <- 10
   day <- 1
   # Stores # of stocks we are looking at
   numstock <- length(tickers)
@@ -89,12 +89,15 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   colnames(dfRSICondense)[3] <- "Value"
   # Plot the ATR of tickers
   plot3 <- ggplot(dfRSICondense, aes(Date, Value, color = variable)) + 
-    geom_line(size=0.5)
+    geom_line(size=0.5) + geom_hline(aes(yintercept=30)) + 
+    geom_hline(aes(yintercept=70))
   
-  # Print out graphs
   print(plot1)
   print(plot2)
   print(plot3)
+  
+  # Print out graphs
+
   
   rm(list = ls())
 } else {
