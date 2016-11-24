@@ -7,7 +7,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   # MACROS - Tickers - Vector of tags wanted
   #          Month - Desired month to start from
   #          Day - Desired day to start from
-  tickers <- c("YHOO","AAPL","IWM","SMH","OIH","XLY")
+  tickers <- c("MSFT","IWM","KO","AAPL","DD")
   month <- 10
   day <- 1
   # Stores # of stocks we are looking at
@@ -87,12 +87,25 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
     geom_line(size=0.5) + geom_hline(aes(yintercept=30)) + 
     geom_hline(aes(yintercept=70)) + ggtitle("Relative Strength Index")
   
+  MACDset <- do.call(merge, lapply(tickers, function(x) 
+   MACD(get(x)[, 6], 8, 17, 9, maType="EMA", percent=FALSE)))
+  
+  MACDset <- subset(MACDset, index(MACDset) >= 
+                     paste("2016-", month, "-", "0", day, sep = '', collapse=''))
+  
+  print(MACDset)
+  dfMACD <- data.frame(Date=index(MACDset), MACDset, row.names=NULL)
+  colnames(dfMACD) <- c("Date", tickers, paste(tickers, "signal"))
+  dfMACDCondense = melt(dfMACD, id='Date')
+  colnames(dfMACDCondense)[3] <- "Value"
+  plot4 <- ggplot(dfMACDCondense, aes(Date, Value, color = variable)) + 
+    geom_line(size=0.5) + ggtitle("Moving Average Convergence Divergence & Signal")
+  
+  # Print out graphs
   print(plot1)
   print(plot2)
   print(plot3)
-  
-  # Print out graphs
-
+  print(plot4)
   
   rm(list = ls())
 } else {
