@@ -53,11 +53,11 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   
   # Create set to store results of ATR (Average True Range)
   ATRset <- do.call(merge, lapply(tickers, function(x) ATR(get(x), 20)))
-
+  
   # Subset the data (cut based on time), then make it into a dataframe and
   # Subset yet again into only atr columns (We don't want tr, etc.)
   ATRset <- subset(ATRset, index(ATRset) >= 
-                      paste("2016-", month, "-", "0", day, sep = '', collapse=''))
+                     paste("2016-", month, "-", "0", day, sep = '', collapse=''))
   dfATR <- data.frame(Date=index(ATRset), ATRset, row.names=NULL)
   dfATR <- dfATR[, getsubatr]
   # Make the graph pretty
@@ -88,12 +88,11 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
     geom_hline(aes(yintercept=70)) + ggtitle("Relative Strength Index")
   
   MACDset <- do.call(merge, lapply(tickers, function(x) 
-   MACD(get(x)[, 6], 8, 17, 9, maType="EMA", percent=FALSE)))
+    MACD(get(x)[, 6], 8, 17, 9, maType="EMA", percent=FALSE)))
   
   MACDset <- subset(MACDset, index(MACDset) >= 
-                     paste("2016-", month, "-", "0", day, sep = '', collapse=''))
+                      paste("2016-", month, "-", "0", day, sep = '', collapse=''))
   
-  print(MACDset)
   dfMACD <- data.frame(Date=index(MACDset), MACDset, row.names=NULL)
   colnames(dfMACD) <- c("Date", tickers, paste(tickers, "signal"))
   dfMACDCondense = melt(dfMACD, id='Date')
