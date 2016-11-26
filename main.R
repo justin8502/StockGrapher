@@ -93,24 +93,34 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   # Subset the data (cut based on time), then make it into a dataframe
   MACDset <- subset(MACDset, index(MACDset) >= 
                       paste("2016-", month, "-", "0", day, sep = '', collapse=''))
-  dfMACD <- data.frame(Date=index(MACDset), MACDset, row.names=NULL)
-  # Make the graph pretty
-  colnames(dfMACD) <- c("Date", tickers, paste(tickers, "signal"))
+  even <- seq_len(ncol(MACDset)) %% 2
+  dfMACD <- data.frame(Date=index(MACDset), x=MACDset[, even])
+  dfSignal <- data.frame(Date=index(MACDset), x=MACDset[, !even])
+  colnames(dfMACD) <- c("Date", tickers)
+  colnames(dfSignal) <- c("Date", paste(tickers, "Signal"))
   # Condense for easy graphing
   dfMACDCondense = melt(dfMACD, id='Date')
   # Make graph EVEN prettier
   colnames(dfMACDCondense)[3] <- "Value"
   # Plot the MACD of tickers
   plot4 <- ggplot(dfMACDCondense, aes(Date, Value, color = variable)) + 
-    geom_line(size=0.5) + ggtitle("Moving Average Convergence Divergence & Signal")
+   geom_line(size=0.5) + ggtitle("Moving Average Convergence Divergence")
+  # Condense for easy graphing
+  dfSignalCondense = melt(dfSignal, id='Date')
+  # Make graph EVEN prettier
+  colnames(dfSignalCondense)[3] <- "Value"
+  # Plot the MACD of tickers
+  plot5 <- ggplot(dfSignalCondense, aes(Date, Value, color = variable)) + 
+    geom_line(size=0.5) + ggtitle("Signal")
   
   # Print out graphs
   print(plot1)
   print(plot2)
   print(plot3)
   print(plot4)
+  print(plot5)
   
-  # rm(list = ls())
+  rm(list = ls())
 } else {
   print("Load packages failed")
 }
