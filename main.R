@@ -87,16 +87,20 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
     geom_line(size=0.5) + geom_hline(aes(yintercept=30)) + 
     geom_hline(aes(yintercept=70)) + ggtitle("Relative Strength Index")
   
+  # Create set to store results of MACD (Moving Average Convergence Divergence)
   MACDset <- do.call(merge, lapply(tickers, function(x) 
     MACD(get(x)[, 6], 8, 17, 9, maType="EMA", percent=FALSE)))
-  
+  # Subset the data (cut based on time), then make it into a dataframe
   MACDset <- subset(MACDset, index(MACDset) >= 
                       paste("2016-", month, "-", "0", day, sep = '', collapse=''))
-  
   dfMACD <- data.frame(Date=index(MACDset), MACDset, row.names=NULL)
+  # Make the graph pretty
   colnames(dfMACD) <- c("Date", tickers, paste(tickers, "signal"))
+  # Condense for easy graphing
   dfMACDCondense = melt(dfMACD, id='Date')
+  # Make graph EVEN prettier
   colnames(dfMACDCondense)[3] <- "Value"
+  # Plot the MACD of tickers
   plot4 <- ggplot(dfMACDCondense, aes(Date, Value, color = variable)) + 
     geom_line(size=0.5) + ggtitle("Moving Average Convergence Divergence & Signal")
   
@@ -106,7 +110,7 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   print(plot3)
   print(plot4)
   
-  rm(list = ls())
+  # rm(list = ls())
 } else {
   print("Load packages failed")
 }
