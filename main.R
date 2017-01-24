@@ -120,7 +120,6 @@ if(require(quantmod) && require(ggplot2) && require(reshape2) && require(TTR)){
   print(plot4)
   print(plot5)
   
-  rm(list = ls())
 } else {
   print("Load packages failed")
 }
